@@ -31,7 +31,7 @@ function rcp_mailchimp_settings_page() {
 		
 	?>
 	<div class="wrap">
-		<h2><?php _e( 'Restrict Content Pro Mail Chimp Settings', 'rcp' ); ?></h2>
+		<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
 		<?php
 		if ( ! isset( $_REQUEST['updated'] ) )
 			$_REQUEST['updated'] = false;
