@@ -27,6 +27,7 @@ add_action( 'admin_init', 'rcp_mailchimp_register_settings', 100 );
 function rcp_mailchimp_settings_page() {
 	
 	$rcp_mc_options = get_option('rcp_mailchimp_settings');
+	$saved_list     = isset( $rcp_mc_options['mailchimp_list'] ) ? $rcp_mc_options['mailchimp_list'] : false;
 		
 	?>
 	<div class="wrap">
@@ -63,7 +64,7 @@ function rcp_mailchimp_settings_page() {
 							<?php
 								if($lists) :
 									foreach($lists as $list) :
-										echo '<option value="' . $list['id'] . '"' . selected($rcp_mc_options['mailchimp_list'], $list['id'], false) . '>' . $list['name'] . '</option>';
+										echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $saved_list, $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
 									endforeach;
 								else :
 							?>
