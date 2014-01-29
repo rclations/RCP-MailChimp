@@ -11,7 +11,7 @@ Contributors: Pippin Williamson
 
 function rcp_mailchimp_settings_menu() {
 	// add settings page
-	add_submenu_page('rcp-members', __('Restrict Content Pro Mail Chimp Settings', 'rcp'), __('Mail Chimp', 'rcp'),'manage_options', 'rcp-mailchimp', 'rcp_mailchimp_settings_page');
+	add_submenu_page( 'rcp-members', __('Restrict Content Pro Mail Chimp Settings', 'rcp' ), __('Mail Chimp', 'rcp' ),'manage_options', 'rcp-mailchimp', 'rcp_mailchimp_settings_page');
 }
 add_action('admin_menu', 'rcp_mailchimp_settings_menu', 100);
 
@@ -31,7 +31,7 @@ function rcp_mailchimp_settings_page() {
 		
 	?>
 	<div class="wrap">
-		<h2><?php _e('Restrict Content Pro Mail Chimp Settings', 'rcp'); ?></h2>
+		<h2><?php _e( 'Restrict Content Pro Mail Chimp Settings', 'rcp' ); ?></h2>
 		<?php
 		if ( ! isset( $_REQUEST['updated'] ) )
 			$_REQUEST['updated'] = false;
@@ -52,7 +52,7 @@ function rcp_mailchimp_settings_page() {
 					</th>
 					<td>
 						<input class="regular-text" type="text" id="rcp_mailchimp_settings[mailchimp_api]" name="rcp_mailchimp_settings[mailchimp_api]" value="<?php if(isset($rcp_mc_options['mailchimp_api'])) { echo $rcp_mc_options['mailchimp_api']; } ?>"/>
-						<div class="description"><?php _e('Enter your Mail Chimp API key to enable a newsletter signup option with the registration form.', 'rcp'); ?></div>
+						<div class="description"><?php _e( 'Enter your Mail Chimp API key to enable a newsletter signup option with the registration form.', 'rcp' ); ?></div>
 					</td>
 				</tr>
 				<tr>
@@ -62,16 +62,16 @@ function rcp_mailchimp_settings_page() {
 					<td>
 						<select id="rcp_mailchimp_settings[mailchimp_list]" name="rcp_mailchimp_settings[mailchimp_list]">
 							<?php
-								if($lists) :
-									foreach($lists as $list) :
+								if( $lists ) :
+									foreach( $lists as $list ) :
 										echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $saved_list, $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
 									endforeach;
 								else :
 							?>
-							<option value="no list"><?php _e('no lists', 'rcp'); ?></option>
+							<option value="no list"><?php _e( 'no lists', 'rcp' ); ?></option>
 						<?php endif; ?>
 						</select>
-						<div class="description"><?php _e('Choose the list to subscribe users to', 'rcp'); ?></div>
+						<div class="description"><?php _e( 'Choose the list to subscribe users to', 'rcp' ); ?></div>
 					</td>
 				</tr>
 				<tr>
@@ -80,7 +80,7 @@ function rcp_mailchimp_settings_page() {
 					</th>
 					<td>
 						<input class="regular-text" type="text" id="rcp_mailchimp_settings[signup_label]" name="rcp_mailchimp_settings[signup_label]" value="<?php if(isset($rcp_mc_options['signup_label'])) { echo $rcp_mc_options['signup_label']; } ?>"/>
-						<div class="description"><?php _e('Enter the label to be shown on the "Signup for Newsletter" checkbox', 'rcp'); ?></div>
+						<div class="description"><?php _e( 'Enter the label to be shown on the "Signup for Newsletter" checkbox', 'rcp' ); ?></div>
 					</td>
 				</tr>
 			</table>
@@ -95,7 +95,7 @@ function rcp_mailchimp_settings_page() {
 }
 
 function rcp_mailchimp_admin_styles() {
-	wp_enqueue_style('rcp-admin', RCP_PLUGIN_DIR . 'includes/css/admin-styles.css');
+	wp_enqueue_style( 'rcp-admin', RCP_PLUGIN_DIR . 'includes/css/admin-styles.css');
 }
 if (isset($_GET['page']) && ($_GET['page'] == 'rcp-mailchimp')) {
 	add_action('admin_enqueue_scripts', 'rcp_mailchimp_admin_styles');
@@ -159,7 +159,7 @@ function rcp_mailchimp_fields() {
 		if( ! empty( $rcp_mc_options['mailchimp_api'] ) ) { ?>
 		<p>
 			<input name="rcp_mailchimp_signup" id="rcp_mailchimp_signup" type="checkbox" checked="checked"/>
-			<label for="rcp_mailchimp_signup"><?php echo isset( $rcp_mc_options['signup_label'] ) ? $rcp_mc_options['signup_label'] : __( 'Signup for our newsletter', 'rcp'); ?></label>
+			<label for="rcp_mailchimp_signup"><?php echo isset( $rcp_mc_options['signup_label'] ) ? $rcp_mc_options['signup_label'] : __( 'Signup for our newsletter', 'rcp' ); ?></label>
 		</p>
 		<?php
 	}
@@ -192,9 +192,9 @@ function rcp_add_mc_table_column_content($user_id) {
 	$signed_up = get_user_meta( $user_id, 'rcp_subscribed_to_mailchimp', true );
 	
 	if( $signed_up )
-		$signed_up = __('yes', 'rcp');
+		$signed_up = __('yes', 'rcp' );
 	else
-		$signed_up = __('no', 'rcp');
+		$signed_up = __('no', 'rcp' );
 		
 	echo '<td>' . $signed_up . '</td>';
 }
