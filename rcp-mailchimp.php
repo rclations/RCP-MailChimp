@@ -106,39 +106,45 @@ function rcp_get_mailchimp_lists() {
 	
 	$rcp_mc_options = get_option('rcp_mailchimp_settings');
 	
-	if(strlen(trim($rcp_mc_options['mailchimp_api'])) > 0 ) {
+	if( ! empty( $rcp_mc_options['mailchimp_api'] ) ) {
 		
+		$api_key = trim( $rcp_mc_options['mailchimp_api'] );
+
 		$lists = array();
 		if( ! class_exists( 'MCAPI' ) )
-			require_once('mailchimp/MCAPI.class.php');
-		$api = new MCAPI($rcp_mc_options['mailchimp_api']);
+			require_once( 'mailchimp/MCAPI.class.php' );
+		$api = new MCAPI( $api_key );
 		$list_data = $api->lists();
-		if($list_data) :
-			foreach($list_data['data'] as $key => $list) :
-				$lists[$key]['id'] = $list['id'];
-				$lists[$key]['name'] = $list['name'];
-			endforeach;
-		endif;
+		if( $list_data ) {
+			foreach( $list_data['data'] as $key => $list ) {
+				$lists[ $key ]['id']   = $list['id'];
+				$lists[ $key ]['name'] = $list['name'];
+			}
+		}
 		return $lists;
 	}
 	return false;
 }
 
 // adds an email to the mailchimp subscription list
-function rcp_subscribe_email($email) {
+function rcp_subscribe_email( $email = '' ) {
+
 	$rcp_mc_options = get_option('rcp_mailchimp_settings');
 	
-	if(strlen(trim($rcp_mc_options['mailchimp_api'])) > 0 ) {
+	if( ! empty( $rcp_mc_options['mailchimp_api'] ) ) {
+
+		$api_key = trim( $rcp_mc_options['mailchimp_api'] );
+
 		if( ! class_exists( 'MCAPI' ) )
-			require_once('mailchimp/MCAPI.class.php');
-		$api = new MCAPI($rcp_mc_options['mailchimp_api']);
+			require_once( 'mailchimp/MCAPI.class.php' );
+		$api = new MCAPI( $api_key );
 		
 		$merge_vars = array(
 			'FNAME' => isset( $_POST['rcp_user_first'] ) ? sanitize_text_field( $_POST['rcp_user_first'] ) : '',
-			'LNAME' => isset( $_POST['rcp_user_last'] ) ? sanitize_text_field( $_POST['rcp_user_last'] ) : ''
+			'LNAME' => isset( $_POST['rcp_user_last'] )  ? sanitize_text_field( $_POST['rcp_user_last'] )  : ''
 		);
 
-		if($api->listSubscribe( $rcp_mc_options['mailchimp_list'], $email, $merge_vars ) === true) {
+		if( $api->listSubscribe( $rcp_mc_options['mailchimp_list'], $email, $merge_vars ) === true ) {
 			return true;
 		}
 	}
@@ -150,7 +156,7 @@ function rcp_subscribe_email($email) {
 function rcp_mailchimp_fields() {
 	$rcp_mc_options = get_option('rcp_mailchimp_settings');
 	ob_start(); 
-		if(strlen(trim($rcp_mc_options['mailchimp_api'])) > 0 ) { ?>
+		if( ! empty( $rcp_mc_options['mailchimp_api'] ) ) { ?>
 		<p>
 			<input name="rcp_mailchimp_signup" id="rcp_mailchimp_signup" type="checkbox" checked="checked"/>
 			<label for="rcp_mailchimp_signup"><?php echo isset( $rcp_mc_options['signup_label'] ) ? $rcp_mc_options['signup_label'] : __( 'Signup for our newsletter', 'rcp'); ?></label>
@@ -162,7 +168,7 @@ function rcp_mailchimp_fields() {
 add_action('rcp_before_registration_submit_field', 'rcp_mailchimp_fields', 100);
 
 // checks whether a user should be signed up for he mailchimp list
-function rcp_check_for_email_signup($posted, $user_id) {
+function rcp_check_for_email_signup( $posted, $user_id ) {
 	if( isset( $posted['rcp_mailchimp_signup'] ) ) {
 		if( is_user_logged_in() ) {
 			$user_data 	= get_userdata( $user_id );
