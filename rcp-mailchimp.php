@@ -182,20 +182,14 @@ function rcp_check_for_email_signup( $posted, $user_id ) {
 }
 add_action('rcp_form_processing', 'rcp_check_for_email_signup', 10, 2);
 
-function rcp_add_mc_table_column_header_and_footer() {
-	echo '<th style="width: 140px;">Mail Chimp Signup</th>';
-}
-add_action('rcp_members_page_table_header', 'rcp_add_mc_table_column_header_and_footer');
-add_action('rcp_members_page_table_footer', 'rcp_add_mc_table_column_header_and_footer');
-
-function rcp_add_mc_table_column_content($user_id) {
+function rcp_add_mc_signup_notice($user_id) {
 	$signed_up = get_user_meta( $user_id, 'rcp_subscribed_to_mailchimp', true );
 	
 	if( $signed_up )
 		$signed_up = __('yes', 'rcp' );
 	else
 		$signed_up = __('no', 'rcp' );
-		
-	echo '<td>' . $signed_up . '</td>';
+	
+	echo '<tr><td>MailChimp: ' . $signed_up . '</tr></td>';
 }
-add_action('rcp_members_page_table_column', 'rcp_add_mc_table_column_content');
+add_action('rcp_view_member_after', 'rcp_add_mc_signup_notice');
