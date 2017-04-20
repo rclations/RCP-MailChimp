@@ -172,7 +172,7 @@ function rcp_mailchimp_fields() {
 add_action( 'rcp_before_registration_submit_field', 'rcp_mailchimp_fields', 100 );
 
 // checks whether a user should be signed up for he MailChimp list
-function rcp_check_for_email_signup( $posted, $user_id ) {
+function rcp_mailchimp_check_for_email_signup( $posted, $user_id ) {
 	if ( isset( $posted['rcp_mailchimp_signup'] ) ) {
 		if ( is_user_logged_in() ) {
 			$user_data 	= get_userdata( $user_id );
@@ -184,7 +184,7 @@ function rcp_check_for_email_signup( $posted, $user_id ) {
 		update_user_meta( $user_id, 'rcp_subscribed_to_mailchimp', 'yes' );
 	}
 }
-add_action( 'rcp_form_processing', 'rcp_check_for_email_signup', 10, 2 );
+add_action( 'rcp_form_processing', 'rcp_mailchimp_check_for_email_signup', 10, 2 );
 
 function rcp_add_mc_signup_notice($user_id) {
 	$signed_up = get_user_meta( $user_id, 'rcp_subscribed_to_mailchimp', true );
