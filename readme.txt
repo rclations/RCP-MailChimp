@@ -14,9 +14,9 @@ Add MailChimp integration to Restrict Content Pro.
 
 This is an add-on for the Restrict Content Pro plugin. It does not function on its own.
 
-This plugin will add a Mail Chimp Newsletter signup option to the member registration form in Restrict Content Pro.
+This plugin will add a MailChimp Newsletter signup option to the member registration form in Restrict Content Pro.
 
-Learn more about Restrict Content Pro: http://pippinsplugins.com/restrict-content-pro-premium-content-plugin/
+Learn more about Restrict Content Pro: https://restrictcontentpro.com/
 
 A dramatically improved [Pro version](https://section214.com/product/rcp-mailchimp-pro/) of this plugin is available from Dan Griffiths of Section214. The pro version includes level-specific subscriptions, eCommerce tracking, automatic subscriptions, status tracking, and more. [Upgrade to Pro](https://section214.com/product/rcp-mailchimp-pro/).
 

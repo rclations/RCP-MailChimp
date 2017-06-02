@@ -1,31 +1,43 @@
 <?php
-/*
-Plugin Name: Restrict Content Pro - MailChimp
-Plugin URL: http://pippinsplugins.com/restrict-content-pro-mailchimp/
-Description: Include a MailChimp signup option with your Restrict Content Pro registration form
-Version: 1.2.1
-Author: Pippin Williamson
-Author URI: http://pippinsplugins.com
-Contributors: Pippin Williamson
-Text Domain: restrict-content-pro-mailchimp
-*/
+/**
+ * Plugin Name: Restrict Content Pro - MailChimp
+ * Plugin URL: https://restrictcontentpro.com/downloads/mailchimp/
+ * Description: Include a MailChimp signup option with your Restrict Content Pro registration form
+ * Version: 1.2.1
+ * Author: Pippin Williamson
+ * Author URI: http://pippinsplugins.com
+ * Contributors: Pippin Williamson
+ * Text Domain: restrict-content-pro-mailchimp
+ */
 
+/**
+ * Create settings page
+ *
+ * @since  1.0
+ * @return void
+ */
 function rcp_mailchimp_settings_menu() {
-	// add settings page
-
 	add_submenu_page( 'rcp-members', __( 'Restrict Content Pro MailChimp Settings', 'restrict-content-pro-mailchimp' ), __( 'MailChimp', 'restrict-content-pro-mailchimp' ), 'manage_options', 'rcp-mailchimp', 'rcp_mailchimp_settings_page' );
 }
 add_action( 'admin_menu', 'rcp_mailchimp_settings_menu', 100 );
 
-// register the plugin settings
+/**
+ * Register plugin settings
+ *
+ * @since  1.0
+ * @return void
+ */
 function rcp_mailchimp_register_settings() {
-
-	// create whitelist of options
 	register_setting( 'rcp_mailchimp_settings_group', 'rcp_mailchimp_settings' );
 }
-//call register settings function
 add_action( 'admin_init', 'rcp_mailchimp_register_settings', 100 );
 
+/**
+ * Render settings page
+ *
+ * @since  1.0
+ * @return void
+ */
 function rcp_mailchimp_settings_page() {
 
 	$rcp_mc_options = get_option( 'rcp_mailchimp_settings' );
@@ -53,7 +65,7 @@ function rcp_mailchimp_settings_page() {
 						<label for="rcp_mailchimp_settings[mailchimp_api]"><?php _e( 'MailChimp API Key', 'restrict-content-pro-mailchimp' ); ?></label>
 					</th>
 					<td>
-						<input class="regular-text" type="text" id="rcp_mailchimp_settings[mailchimp_api]" name="rcp_mailchimp_settings[mailchimp_api]" value="<?php if ( isset( $rcp_mc_options['mailchimp_api'] ) ) { echo $rcp_mc_options['mailchimp_api']; } ?>"/>
+						<input class="regular-text" type="text" id="rcp_mailchimp_settings[mailchimp_api]" name="rcp_mailchimp_settings[mailchimp_api]" value="<?php echo isset( $rcp_mc_options['mailchimp_api'] ) ? esc_attr( $rcp_mc_options['mailchimp_api'] ) : ''; ?>"/>
 						<div class="description"><?php _e( 'Enter your MailChimp API key to enable a newsletter signup option with the registration form.', 'restrict-content-pro-mailchimp' ); ?></div>
 					</td>
 				</tr>
@@ -64,7 +76,7 @@ function rcp_mailchimp_settings_page() {
 					<td>
 						<select id="rcp_mailchimp_settings[mailchimp_list]" name="rcp_mailchimp_settings[mailchimp_list]">
 							<?php
-							if ( $lists ) :
+							if ( is_array( $lists ) && ! empty( $lists ) ) :
 								foreach ( $lists as $list ) :
 									echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $saved_list, $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
 								endforeach;
@@ -81,14 +93,14 @@ function rcp_mailchimp_settings_page() {
 						<label for="rcp_mailchimp_settings[signup_label]"><?php _e( 'Form Label', 'restrict-content-pro-mailchimp' ); ?></label>
 					</th>
 					<td>
-						<input class="regular-text" type="text" id="rcp_mailchimp_settings[signup_label]" name="rcp_mailchimp_settings[signup_label]" value="<?php if ( isset( $rcp_mc_options['signup_label'] ) ) { echo $rcp_mc_options['signup_label']; } ?>"/>
+						<input class="regular-text" type="text" id="rcp_mailchimp_settings[signup_label]" name="rcp_mailchimp_settings[signup_label]" value="<?php echo isset( $rcp_mc_options['signup_label'] ) ? esc_attr( $rcp_mc_options['signup_label'] ) : ''; ?>"/>
 						<div class="description"><?php _e( 'Enter the label to be shown on the "Signup for Newsletter" checkbox', 'restrict-content-pro-mailchimp' ); ?></div>
 					</td>
 				</tr>
 			</table>
 			<!-- save the options -->
 			<p class="submit">
-				<input type="submit" class="button-primary" value="<?php _e( 'Save Options', 'restrict-content-pro-mailchimp' ); ?>" />
+				<input type="submit" class="button-primary" value="<?php esc_attr_e( 'Save Options', 'restrict-content-pro-mailchimp' ); ?>" />
 			</p>
 
 		</form>
@@ -96,14 +108,12 @@ function rcp_mailchimp_settings_page() {
 	<?php
 }
 
-function rcp_mailchimp_admin_styles() {
-	wp_enqueue_style( 'rcp-admin', RCP_PLUGIN_DIR . 'includes/css/admin-styles.css' );
-}
-if ( isset( $_GET['page'] ) && ( $_GET['page'] == 'rcp-mailchimp' ) ) {
-	add_action('admin_enqueue_scripts', 'rcp_mailchimp_admin_styles');
-}
-
-// get an array of all MailChimp subscription lists
+/**
+ * Get an array of all MailChimp subscription lists
+ *
+ * @since  1.0
+ * @return array|bool
+ */
 function rcp_get_mailchimp_lists() {
 
 	$rcp_mc_options = get_option( 'rcp_mailchimp_settings' );
@@ -117,7 +127,7 @@ function rcp_get_mailchimp_lists() {
 			require_once( 'mailchimp/MCAPI.class.php' );
 		$api = new MCAPI( $api_key );
 		$list_data = $api->lists();
-		if ( $list_data ) {
+		if ( $list_data && is_array( $list_data ) ) {
 			foreach ( $list_data['data'] as $key => $list ) {
 				$lists[ $key ]['id']   = $list['id'];
 				$lists[ $key ]['name'] = $list['name'];
@@ -128,7 +138,14 @@ function rcp_get_mailchimp_lists() {
 	return false;
 }
 
-// adds an email to the MailChimp subscription list
+/**
+ * Adds an email to the MailChimp subscription list
+ *
+ * @param string $email Email address to subscribe.
+ *
+ * @since  1.0
+ * @return bool
+ */
 function rcp_subscribe_email( $email = '' ) {
 
 	$rcp_mc_options = get_option( 'rcp_mailchimp_settings' );
@@ -156,7 +173,12 @@ function rcp_subscribe_email( $email = '' ) {
 	return false;
 }
 
-// displays the mailchimp checkbox
+/**
+ * Display the MailChimp signup checkbox on the registration form
+ *
+ * @since  1.0
+ * @return void
+ */
 function rcp_mailchimp_fields() {
 	$rcp_mc_options = get_option('rcp_mailchimp_settings');
 	ob_start();
@@ -171,14 +193,22 @@ function rcp_mailchimp_fields() {
 }
 add_action( 'rcp_before_registration_submit_field', 'rcp_mailchimp_fields', 100 );
 
-// checks whether a user should be signed up for he MailChimp list
-function rcp_check_for_email_signup( $posted, $user_id ) {
+/**
+ * Checks whether a user should be signed up for the MailChimp list
+ *
+ * @param array $posted  Array of data submitted through the form.
+ * @param int   $user_id ID of the user.
+ *
+ * @since  1.0
+ * @return void
+ */
+function rcp_mailchimp_check_for_email_signup( $posted, $user_id ) {
 	if ( isset( $posted['rcp_mailchimp_signup'] ) ) {
 		// Set a flag so we know to add them to the list after account activation.
 		update_user_meta( $user_id, 'rcp_pending_mailchimp_signup', true );
 	}
 }
-add_action( 'rcp_form_processing', 'rcp_check_for_email_signup', 10, 2 );
+add_action( 'rcp_form_processing', 'rcp_mailchimp_check_for_email_signup', 10, 2 );
 
 /**
  * Add member to the MailChimp list when their account is activated
@@ -208,6 +238,14 @@ function rcp_mailchimp_add_to_list( $status, $user_id, $old_status, $member ) {
 }
 add_action( 'rcp_set_status', 'rcp_mailchimp_add_to_list', 10, 4 );
 
+/**
+ * Display note on Edit Member page indicating if the user signed up for the mailing list
+ *
+ * @param int $user_id
+ *
+ * @since  1.2
+ * @return void
+ */
 function rcp_add_mc_signup_notice($user_id) {
 	$signed_up = get_user_meta( $user_id, 'rcp_subscribed_to_mailchimp', true );
 
@@ -216,6 +254,6 @@ function rcp_add_mc_signup_notice($user_id) {
 	else
 		$signed_up = __('no', 'rcp' );
 
-	echo '<tr><td>MailChimp: ' . $signed_up . '</tr></td>';
+	echo '<tr><td>' . __( 'MailChimp:', 'restrict-content-pro-mailchimp' ) . ' ' . $signed_up . '</tr></td>';
 }
 add_action('rcp_view_member_after', 'rcp_add_mc_signup_notice');
