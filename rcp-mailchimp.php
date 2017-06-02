@@ -94,7 +94,7 @@ function rcp_mailchimp_settings_page() {
 					</th>
 					<td>
 						<input class="regular-text" type="text" id="rcp_mailchimp_settings[signup_label]" name="rcp_mailchimp_settings[signup_label]" value="<?php echo isset( $rcp_mc_options['signup_label'] ) ? esc_attr( $rcp_mc_options['signup_label'] ) : ''; ?>"/>
-						<div class="description"><?php _e( 'Enter the label to be shown on the "Signup for Newsletter" checkbox', 'restrict-content-pro-mailchimp' ); ?></div>
+						<div class="description"><?php _e( 'Enter the label to be shown on the "Sign up for Newsletter" checkbox', 'restrict-content-pro-mailchimp' ); ?></div>
 					</td>
 				</tr>
 			</table>
@@ -185,7 +185,7 @@ function rcp_mailchimp_fields() {
 	if ( ! empty( $rcp_mc_options['mailchimp_api'] ) ) { ?>
 		<p>
 			<input name="rcp_mailchimp_signup" id="rcp_mailchimp_signup" type="checkbox" checked="checked"/>
-			<label for="rcp_mailchimp_signup"><?php echo isset( $rcp_mc_options['signup_label'] ) ? $rcp_mc_options['signup_label'] : __( 'Signup for our newsletter', 'restrict-content-pro-mailchimp' ); ?></label>
+			<label for="rcp_mailchimp_signup"><?php echo isset( $rcp_mc_options['signup_label'] ) ? $rcp_mc_options['signup_label'] : __( 'Sign up for our newsletter', 'restrict-content-pro-mailchimp' ); ?></label>
 		</p>
 		<?php
 	}
