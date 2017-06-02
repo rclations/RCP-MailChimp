@@ -204,17 +204,39 @@ add_action( 'rcp_before_registration_submit_field', 'rcp_mailchimp_fields', 100 
  */
 function rcp_mailchimp_check_for_email_signup( $posted, $user_id ) {
 	if ( isset( $posted['rcp_mailchimp_signup'] ) ) {
-		if ( is_user_logged_in() ) {
-			$user_data 	= get_userdata( $user_id );
-			$email 		= $user_data->user_email;
-		} else {
-			$email = $posted['rcp_user_email'];
-		}
-		rcp_subscribe_email( $email );
-		update_user_meta( $user_id, 'rcp_subscribed_to_mailchimp', 'yes' );
+		// Set a flag so we know to add them to the list after account activation.
+		update_user_meta( $user_id, 'rcp_pending_mailchimp_signup', true );
 	}
 }
 add_action( 'rcp_form_processing', 'rcp_mailchimp_check_for_email_signup', 10, 2 );
+
+/**
+ * Add member to the MailChimp list when their account is activated
+ *
+ * @param string     $status     New status.
+ * @param int        $user_id    ID of the user.
+ * @param string     $old_status Previous status.
+ * @param RCP_Member $member     Member object.
+ *
+ * @since  1.3
+ * @return void
+ */
+function rcp_mailchimp_add_to_list( $status, $user_id, $old_status, $member ) {
+
+	if ( ! in_array( $status, array( 'active', 'free' ) ) ) {
+		return;
+	}
+
+	if ( ! get_user_meta( $user_id, 'rcp_pending_mailchimp_signup', true ) ) {
+		return;
+	}
+
+	rcp_subscribe_email( $member->user_email );
+	update_user_meta( $user_id, 'rcp_subscribed_to_mailchimp', 'yes' );
+	delete_user_meta( $user_id, 'rcp_pending_mailchimp_signup' );
+
+}
+add_action( 'rcp_set_status', 'rcp_mailchimp_add_to_list', 10, 4 );
 
 /**
  * Display note on Edit Member page indicating if the user signed up for the mailing list
