@@ -257,3 +257,21 @@ function rcp_add_mc_signup_notice($user_id) {
 	echo '<tr><td>' . __( 'MailChimp:', 'restrict-content-pro-mailchimp' ) . ' ' . $signed_up . '</tr></td>';
 }
 add_action('rcp_view_member_after', 'rcp_add_mc_signup_notice');
+
+/**
+ * Load plugin text domain for translations
+ *
+ * @since 1.3
+ * @return void
+ */
+function rcp_mailchimp_load_textdomain() {
+
+	// Set filter for plugin's languages directory
+	$lang_dir = dirname( plugin_basename( __FILE__ ) ) . '/languages/';
+	$lang_dir = apply_filters( 'rcp_mailchimp_languages_directory', $lang_dir );
+
+	// Load the translations
+	load_plugin_textdomain( 'restrict-content-pro-mailchimp', false, $lang_dir );
+
+}
+add_action( 'init', 'rcp_mailchimp_load_textdomain' );
