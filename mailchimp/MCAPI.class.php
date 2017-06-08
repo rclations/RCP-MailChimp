@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class MCAPI
+ *
+ * @deprecated 1.3
+ */
 class MCAPI {
     var $version = "1.3";
     var $errorMessage;
