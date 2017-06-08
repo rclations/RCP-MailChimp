@@ -122,19 +122,41 @@ function rcp_get_mailchimp_lists() {
 
 		$api_key = trim( $rcp_mc_options['mailchimp_api'] );
 
-		$lists = array();
-		if ( ! class_exists( 'MCAPI' ) )
-			require_once( 'mailchimp/MCAPI.class.php' );
-		$api = new MCAPI( $api_key );
-		$list_data = $api->lists();
-		if ( $list_data && is_array( $list_data ) ) {
-			foreach ( $list_data['data'] as $key => $list ) {
-				$lists[ $key ]['id']   = $list['id'];
-				$lists[ $key ]['name'] = $list['name'];
-			}
+		$data_center = explode( '-', $api_key );
+		$data_center = $data_center[1];
+
+		$request_url = 'https://' . urlencode( $data_center ) . '.api.mailchimp.com/3.0/lists/?count=25';
+
+		$args = array(
+			'headers' => array(
+				'Authorization' => 'Basic ' . base64_encode( 'user:' . $api_key )
+			)
+		);
+
+		$response = wp_remote_get( $request_url, $args );
+
+		if ( is_wp_error( $response ) || 200 != wp_remote_retrieve_response_code( $response ) ) {
+			return false;
 		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( empty( $data['lists'] ) || ! is_array( $data['lists'] ) ) {
+			return false;
+		}
+
+		$lists = array();
+
+		foreach ( $data['lists'] as $list_info ) {
+			$lists[] = array(
+				'id'   => $list_info['id'],
+				'name' => $list_info['name']
+			);
+		}
+
 		return $lists;
 	}
+
 	return false;
 }
 
@@ -150,27 +172,50 @@ function rcp_subscribe_email( $email = '' ) {
 
 	$rcp_mc_options = get_option( 'rcp_mailchimp_settings' );
 
-	if ( ! empty( $rcp_mc_options['mailchimp_api'] ) ) {
-
-		$api_key = trim( $rcp_mc_options['mailchimp_api'] );
-		$list_id = trim( $rcp_mc_options['mailchimp_list'] );
-
-		if ( ! class_exists( 'MCAPI' ) )
-			require_once( 'mailchimp/MCAPI.class.php' );
-
-		$api = new MCAPI( $api_key );
-
-		$merge_vars = apply_filters( 'rcp_mailchimp_merge_vars', array(
-			'FNAME' => isset( $_POST['rcp_user_first'] ) ? sanitize_text_field( $_POST['rcp_user_first'] ) : '',
-			'LNAME' => isset( $_POST['rcp_user_last'] )  ? sanitize_text_field( $_POST['rcp_user_last'] )  : ''
-		), $email, $list_id );
-
-		if ( $api->listSubscribe( $list_id, $email, $merge_vars ) === true ) {
-			return true;
-		}
+	// Bail if API key isn't set.
+	if ( empty( $rcp_mc_options['mailchimp_api'] ) ) {
+		return false;
 	}
 
-	return false;
+	$api_key = trim( $rcp_mc_options['mailchimp_api'] );
+	$list_id = trim( $rcp_mc_options['mailchimp_list'] );
+
+	$data_center = explode( '-', $api_key );
+	$data_center = $data_center[1];
+
+	$request_url = 'https://' . urlencode( $data_center ) . '.api.mailchimp.com/3.0/lists/' . urlencode( $list_id ) . '/members';
+
+	/**
+	 * Allows merge vars to be filtered.
+	 *
+	 * @param array  $merge_vars Default merge vars.
+	 * @param string $email      Email address being subscribed.
+	 * @param string $list_id    ID of the list the user is being subscribed to.
+	 */
+	$merge_vars = apply_filters( 'rcp_mailchimp_merge_vars', array(
+		'FNAME' => isset( $_POST['rcp_user_first'] ) ? sanitize_text_field( $_POST['rcp_user_first'] ) : '',
+		'LNAME' => isset( $_POST['rcp_user_last'] )  ? sanitize_text_field( $_POST['rcp_user_last'] )  : ''
+	), $email, $list_id );
+
+	// Request arguments.
+	$args = array(
+		'headers' => array(
+			'Authorization' => 'Basic ' . base64_encode( 'user:' . $api_key )
+		),
+		'body'    => json_encode( array(
+			'email_address' => sanitize_email( $email ),
+			'status'        => 'pending',
+			'merge_fields'  => $merge_vars
+		) )
+	);
+
+	$response = wp_remote_post( $request_url, $args );
+
+	if ( is_wp_error( $response ) || 200 != wp_remote_retrieve_response_code( $response ) ) {
+		return false;
+	}
+
+	return true;
 }
 
 /**
