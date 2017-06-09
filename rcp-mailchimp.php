@@ -71,6 +71,15 @@ function rcp_mailchimp_settings_page() {
 				</tr>
 				<tr>
 					<th>
+						<label for="rcp_mailchimp_settings[double_optin]"><?php _e( 'Double Opt-In', 'restrict-content-pro-mailchimp' ); ?></label>
+					</th>
+					<td>
+						<input id="rcp_mailchimp_settings[double_optin]" name="rcp_mailchimp_settings[double_optin]" value="1" type="checkbox" <?php if ( '1' == $rcp_mc_options['double_optin'] ) echo 'checked="checked"'; ?>/>
+						<label for="rcp_mailchimp_signup"><?php _e( 'Disable email opt-in for new subscribers', 'restrict-content-pro-mailchimp' ); ?></label>
+					</td>
+				</tr>
+				<tr>
+					<th>
 						<label for="rcp_mailchimp_settings[mailchimp_list]"><?php _e( 'Newsletter List', 'restrict-content-pro-mailchimp' ); ?></label>
 					</th>
 					<td>
@@ -172,6 +181,9 @@ function rcp_subscribe_email( $email = '' ) {
 
 	$rcp_mc_options = get_option( 'rcp_mailchimp_settings' );
 
+	// Set Double-Optin status
+	$status = '1' === $rcp_mc_options['double_optin'] ? 'subscribed' : 'pending';
+
 	// Bail if API key isn't set.
 	if ( empty( $rcp_mc_options['mailchimp_api'] ) ) {
 		return false;
@@ -204,7 +216,7 @@ function rcp_subscribe_email( $email = '' ) {
 		),
 		'body'    => json_encode( array(
 			'email_address' => sanitize_email( $email ),
-			'status'        => 'pending',
+			'status'        => $status,
 			'merge_fields'  => $merge_vars
 		) )
 	);
